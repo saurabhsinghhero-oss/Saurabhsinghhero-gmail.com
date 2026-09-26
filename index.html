@@ -1,0 +1,1288 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuSolve AI - Smart Document & File Problem Solver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#7C3AED',
+                        accent: '#06B6D4',
+                        dark: '#0F172A'
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'gradient': 'gradient 8s ease infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #06B6D4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(-45deg, #4F46E5, #7C3AED, #06B6D4, #4F46E5);
+            background-size: 400% 400%;
+            animation: gradient 8s ease infinite;
+        }
+        
+        .hero-grid {
+            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+        
+        .file-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(79, 70, 229, 0.2);
+        }
+        
+        .chat-message {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .ad-banner {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px dashed #f59e0b;
+        }
+        
+        .ad-sidebar {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 2px dashed #3b82f6;
+        }
+        
+        .usage-ring {
+            background: conic-gradient(#4F46E5 var(--percent), #e5e7eb 0deg);
+        }
+        
+        .scrolled-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+        }
+        
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .has-tooltip:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .language-hindi {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+        }
+        
+        .premium-glow {
+            box-shadow: 0 0 40px rgba(79, 70, 229, 0.3);
+        }
+        
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4F46E5;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4338ca;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+
+    <!-- Top Ad Banner -->
+    <div class="ad-banner w-full py-2 px-4 text-center text-sm text-amber-800 relative z-50">
+        <div class="container mx-auto flex items-center justify-center gap-2">
+            <i class="fas fa-ad text-amber-600"></i>
+            <span class="font-medium">Sponsored:</span>
+            <span>Boost your productivity with Premium AI Tools - Up to 50% Off!</span>
+            <button class="ml-2 px-3 py-0.5 bg-amber-600 text-white rounded-full text-xs hover:bg-amber-700 transition">View Deal</button>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-amber-700 hover:text-amber-900"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-40 transition-all duration-300 top-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 rounded-2xl px-6 transition-all duration-300" id="nav-container">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                    <span class="text-xl font-bold text-slate-900">DocuSolve <span class="gradient-text">AI</span></span>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#features" class="text-slate-600 hover:text-primary font-medium transition">Features</a>
+                    <a href="#files" class="text-slate-600 hover:text-primary font-medium transition">File Types</a>
+                    <a href="#pricing" class="text-slate-600 hover:text-primary font-medium transition">Pricing</a>
+                    <a href="#ai-assistant" class="text-slate-600 hover:text-primary font-medium transition">AI Assistant</a>
+                    <a href="#faq" class="text-slate-600 hover:text-primary font-medium transition">FAQ</a>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="relative hidden sm:block">
+                        <select id="languageSelect" onchange="changeLanguage(this.value)" class="appearance-none bg-slate-100 border border-slate-200 text-slate-700 py-2 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer font-medium">
+                            <option value="en">English</option>
+                            <option value="hi">हिन्दी (Hindi)</option>
+                            <option value="es">Español</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                            <option value="zh">中文</option>
+                            <option value="ar">العربية</option>
+                        </select>
+                        <i class="fas fa-globe absolute right-3 top-3 text-slate-500"></i>
+                    </div>
+                    <button onclick="openAuthModal('login')" class="hidden sm:block text-slate-600 hover:text-primary font-medium transition">Log In</button>
+                    <button onclick="openAuthModal('signup')" class="gradient-bg text-white px-5 py-2.5 rounded-xl font-semibold hover:shadow-lg hover:shadow-primary/30 transition transform hover:-translate-y-0.5">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden bg-dark hero-grid">
+        <div class="blob w-96 h-96 bg-primary rounded-full top-20 -left-20"></div>
+        <div class="blob w-80 h-80 bg-secondary rounded-full bottom-20 right-0"></div>
+        <div class="blob w-64 h-64 bg-accent rounded-full top-1/2 left-1/2"></div>
+        
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="text-white animate-slide-up">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 glass rounded-full mb-6">
+                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        <span class="text-sm font-medium" id="hero-badge">AI-Powered Document Assistant</span>
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+                        Solve Every <span class="gradient-text">File & Document</span> Problem Instantly
+                    </h1>
+                    <p class="text-lg sm:text-xl text-slate-300 mb-8 max-w-xl" id="hero-desc">
+                        Upload any file, ask any question, fix any issue. Free AI help for everyday document problems. Unlock advanced features for just ₹99/month.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button onclick="scrollToSection('ai-assistant')" class="gradient-bg text-white px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl hover:shadow-primary/40 transition transform hover:-translate-y-1">
+                            <i class="fas fa-robot mr-2"></i> Ask AI Now
+                        </button>
+                        <button onclick="openAuthModal('signup')" class="glass text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white/20 transition">
+                            <i class="fas fa-upload mr-2"></i> Upload File
+                        </button>
+                    </div>
+                    
+                    <div class="mt-10 flex flex-wrap items-center gap-6 text-sm text-slate-400">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span id="hero-stat1">100+ File Formats</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span id="hero-stat2">50+ Languages</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span id="hero-stat3">Free Basic Support</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative animate-float">
+                    <div class="glass-dark rounded-3xl p-6 shadow-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <span class="text-slate-400 text-sm">DocuSolve AI</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="bg-slate-800/50 rounded-xl p-4 flex items-center gap-4">
+                                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 text-xl">
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-white font-medium">corrupted_report.pdf</p>
+                                    <p class="text-slate-400 text-sm">Error: File cannot be opened</p>
+                                </div>
+                                <button class="text-green-400 hover:text-green-300"><i class="fas fa-wrench"></i></button>
+                            </div>
+                            <div class="bg-slate-800/50 rounded-xl p-4 flex items-center gap-4">
+                                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400 text-xl">
+                                    <i class="fas fa-file-excel"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-white font-medium">data_sheet.xlsx</p>
+                                    <p class="text-slate-400 text-sm">Needs conversion & analysis</p>
+                                </div>
+                                <button class="text-green-400 hover:text-green-300"><i class="fas fa-magic"></i></button>
+                            </div>
+                            <div class="bg-slate-800/50 rounded-xl p-4 flex items-center gap-4">
+                                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 text-xl">
+                                    <i class="fas fa-file-word"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-white font-medium">contract.docx</p>
+                                    <p class="text-slate-400 text-sm">Translate to Hindi required</p>
+                                </div>
+                                <button class="text-green-400 hover:text-green-300"><i class="fas fa-language"></i></button>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-4 bg-primary/10 rounded-xl border border-primary/30">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-robot text-primary text-xl mt-1"></i>
+                                <div>
+                                    <p class="text-white text-sm font-medium">AI Analysis Complete</p>
+                                    <p class="text-slate-300 text-sm mt-1">All 3 files have been repaired, converted, and summarized. Your documents are ready!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating badge -->
+                    <div class="absolute -top-4 -right-4 bg-white text-slate-900 px-4 py-2 rounded-full shadow-xl font-bold text-sm flex items-center gap-2">
+                        <i class="fas fa-bolt text-yellow-500"></i>
+                        Instant Fix
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="bg-white py-8 shadow-lg relative z-20">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div>
+                    <p class="text-3xl font-bold gradient-text">10M+</p>
+                    <p class="text-slate-600 text-sm">Files Solved</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold gradient-text">50+</p>
+                    <p class="text-slate-600 text-sm">Languages</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold gradient-text">100+</p>
+                    <p class="text-slate-600 text-sm">File Formats</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold gradient-text">99.9%</p>
+                    <p class="text-slate-600 text-sm">Success Rate</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supported File Types -->
+    <section id="files" class="py-20 bg-slate-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Universal Support</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-2 mb-4">Works With Every File Type</h2>
+                <p class="text-slate-600 text-lg">From documents to media, spreadsheets to code files — our AI understands and solves problems across all formats.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-file-pdf text-4xl text-red-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">PDF</p>
+                    <p class="text-xs text-slate-500 mt-1">Repair, Convert, Edit</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-file-word text-4xl text-blue-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">DOCX</p>
+                    <p class="text-xs text-slate-500 mt-1">Format, Translate</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-file-excel text-4xl text-green-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">XLSX</p>
+                    <p class="text-xs text-slate-500 mt-1">Analyze, Convert</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-file-powerpoint text-4xl text-orange-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">PPTX</p>
+                    <p class="text-xs text-slate-500 mt-1">Design, Convert</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-file-image text-4xl text-purple-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">Images</p>
+                    <p class="text-xs text-slate-500 mt-1">Enhance, Compress</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-file-video text-4xl text-pink-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">Videos</p>
+                    <p class="text-xs text-slate-500 mt-1">Convert, Compress</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-file-audio text-4xl text-yellow-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">Audio</p>
+                    <p class="text-xs text-slate-500 mt-1">Transcribe, Convert</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-file-archive text-4xl text-amber-600 mb-3"></i>
+                    <p class="font-semibold text-slate-800">ZIP/RAR</p>
+                    <p class="text-xs text-slate-500 mt-1">Extract, Repair</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-file-code text-4xl text-cyan-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">Code</p>
+                    <p class="text-xs text-slate-500 mt-1">Debug, Format</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-database text-4xl text-indigo-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">Database</p>
+                    <p class="text-xs text-slate-500 mt-1">Recover, Query</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-file-csv text-4xl text-teal-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">CSV</p>
+                    <p class="text-xs text-slate-500 mt-1">Clean, Analyze</p>
+                </div>
+                <div class="file-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center transition-all duration-300">
+                    <i class="fas fa-ellipsis-h text-4xl text-slate-500 mb-3"></i>
+                    <p class="font-semibold text-slate-800">And More</p>
+                    <p class="text-xs text-slate-500 mt-1">100+ formats</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Powerful Features</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-2 mb-4">Everything You Need For Files</h2>
+                <p class="text-slate-600 text-lg">Comprehensive AI-powered tools to handle any document challenge.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="group p-8 rounded-3xl bg-slate-50 hover:bg-white hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 border border-transparent hover:border-primary/10">
+                    <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center text-primary text-2xl mb-6 group-hover:scale-110 transition">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">File Repair & Recovery</h3>
+                    <p class="text-slate-600">Fix corrupted PDFs, broken Office files, damaged archives, and recover lost data automatically.</p>
+                </div>
+                
+                <div class="group p-8 rounded-3xl bg-slate-50 hover:bg-white hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 border border-transparent hover:border-primary/10">
+                    <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center text-primary text-2xl mb-6 group-hover:scale-110 transition">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Format Conversion</h3>
+                    <p class="text-slate-600">Convert between 100+ formats. PDF to Word, Excel to CSV, video to audio, and much more.</p>
+                </div>
+                
+                <div class="group p-8 rounded-3xl bg-slate-50 hover:bg-white hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 border border-transparent hover:border-primary/10">
+                    <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center text-primary text-2xl mb-6 group-hover:scale-110 transition">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Multilingual AI</h3>
+                    <p class="text-slate-600">Chat in English, Hindi, Spanish, French, Arabic, Chinese, and 45+ other languages.</p>
+                </div>
+                
+                <div class="group p-8 rounded-3xl bg-slate-50 hover:bg-white hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 border border-transparent hover:border-primary/10">
+                    <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center text-primary text-2xl mb-6 group-hover:scale-110 transition">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Smart Document Analysis</h3>
+                    <p class="text-slate-600">Extract insights, summarize long documents, find answers, and generate reports instantly.</p>
+                </div>
+                
+                <div class="group p-8 rounded-3xl bg-slate-50 hover:bg-white hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 border border-transparent hover:border-primary/10">
+                    <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center text-primary text-2xl mb-6 group-hover:scale-110 transition">
+                        <i class="fas fa-compress-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Compress & Optimize</h3>
+                    <p class="text-slate-600">Reduce file sizes without losing quality. Perfect for images, videos, PDFs, and documents.</p>
+                </div>
+                
+                <div class="group p-8 rounded-3xl bg-slate-50 hover:bg-white hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 border border-transparent hover:border-primary/10">
+                    <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center text-primary text-2xl mb-6 group-hover:scale-110 transition">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Security & Privacy</h3>
+                    <p class="text-slate-600">End-to-end encryption, automatic file deletion, and compliance with global privacy standards.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-20 bg-slate-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Simple Process</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-2 mb-4">How DocuSolve AI Works</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="relative">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center h-full">
+                        <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">1</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Upload File</h3>
+                        <p class="text-slate-600 text-sm">Drag & drop any file or document into our secure AI workspace.</p>
+                    </div>
+                    <div class="hidden md:block absolute top-1/2 -right-3 w-6 h-0.5 bg-primary"></div>
+                </div>
+                
+                <div class="relative">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center h-full">
+                        <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">2</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">AI Diagnoses</h3>
+                        <p class="text-slate-600 text-sm">Our advanced AI analyzes the problem in seconds.</p>
+                    </div>
+                    <div class="hidden md:block absolute top-1/2 -right-3 w-6 h-0.5 bg-primary"></div>
+                </div>
+                
+                <div class="relative">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center h-full">
+                        <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">3</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Get Solution</h3>
+                        <p class="text-slate-600 text-sm">Receive step-by-step guidance or instant automated fixes.</p>
+                    </div>
+                    <div class="hidden md:block absolute top-1/2 -right-3 w-6 h-0.5 bg-primary"></div>
+                </div>
+                
+                <div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center h-full">
+                        <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">4</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Download Result</h3>
+                        <p class="text-slate-600 text-sm">Get your repaired, converted, or analyzed file instantly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Pricing</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-2 mb-4">Free For Everyone, Premium For Power Users</h2>
+                <p class="text-slate-600 text-lg">Start free and upgrade only when you need advanced AI capabilities.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <!-- Free Plan -->
+                <div class="bg-slate-50 rounded-3xl p-8 border border-slate-200">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2">Free</h3>
+                        <p class="text-slate-600">For everyday consumers</p>
+                        <div class="mt-4">
+                            <span class="text-5xl font-extrabold text-slate-900">₹0</span>
+                            <span class="text-slate-600">/month</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-slate-700">10 file fixes per month</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-slate-700">Basic format conversion</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-slate-700">AI chat in 50+ languages</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-slate-700">Community support</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span class="text-slate-700">Standard file size limits</span>
+                        </li>
+                    </ul>
+                    <button onclick="openAuthModal('signup')" class="w-full py-4 rounded-2xl border-2 border-primary text-primary font-bold hover:bg-primary hover:text-white transition">
+                        Get Started Free
+                    </button>
+                </div>
+                
+                <!-- Pro Plan -->
+                <div class="relative bg-slate-900 rounded-3xl p-8 premium-glow transform md:-translate-y-4">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 px-4 py-1 rounded-full text-sm font-bold">
+                        Most Popular
+                    </div>
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">Pro</h3>
+                        <p class="text-slate-400">For advanced users</p>
+                        <div class="mt-4">
+                            <span class="text-5xl font-extrabold text-white">₹99</span>
+                            <span class="text-slate-400">/month</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-slate-200">Unlimited file fixes</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-slate-200">Advanced AI repair & recovery</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-slate-200">Batch processing</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-slate-200">Priority support</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-slate-200">No ads experience</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-slate-200">Large file support up to 5GB</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-slate-200">API access</span>
+                        </li>
+                    </ul>
+                    <button onclick="openAuthModal('pro')" class="w-full py-4 rounded-2xl gradient-bg text-white font-bold hover:shadow-xl hover:shadow-primary/40 transition">
+                        Upgrade to Pro
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Assistant Section -->
+    <section id="ai-assistant" class="py-20 bg-slate-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Sidebar Ad -->
+                <div class="hidden lg:block">
+                    <div class="ad-sidebar rounded-2xl p-6 sticky top-24">
+                        <p class="text-xs font-bold text-blue-700 uppercase mb-2">Advertisement</p>
+                        <h4 class="text-blue-900 font-bold mb-2">Premium Cloud Storage</h4>
+                        <p class="text-blue-800 text-sm mb-4">Get 2TB secure cloud storage with AI-powered file organization.</p>
+                        <button class="w-full py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition">Learn More</button>
+                    </div>
+                </div>
+                
+                <!-- AI Chat Interface -->
+                <div class="lg:col-span-2">
+                    <div class="text-center lg:text-left mb-8">
+                        <span class="text-primary font-semibold text-sm uppercase tracking-wider">AI Assistant</span>
+                        <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-2 mb-4">Ask Anything About Your Files</h2>
+                        <p class="text-slate-600 text-lg">Upload a file or type your question. Get instant help in your language.</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+                        <div class="bg-gradient-to-r from-primary to-secondary p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white font-bold">DocuSolve AI</p>
+                                    <p class="text-white/70 text-xs">Online • Multilingual</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-white hover:bg-white/30 transition" title="Upload File">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                <button class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-white hover:bg-white/30 transition" title="Voice Input">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="chat-messages" class="h-96 overflow-y-auto p-6 space-y-4 bg-slate-50">
+                            <div class="chat-message flex items-start gap-3">
+                                <div class="w-8 h-8 gradient-bg rounded-full flex items-center justify-center text-white text-xs flex-shrink-0">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-100 max-w-[80%]">
+                                    <p class="text-slate-800" id="welcome-message">Hello! I'm DocuSolve AI. I can help you repair, convert, analyze, or understand any file. Upload a file or ask me anything. मैं हिंदी में भी मदद कर सकता हूँ।</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 bg-white border-t border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <input type="file" id="chat-file" class="hidden" onchange="handleFileUpload(this)">
+                                <button onclick="document.getElementById('chat-file').click()" class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <input type="text" id="chat-input" placeholder="Ask about your file or problem..." 
+                                    class="flex-1 px-4 py-3 rounded-xl bg-slate-100 border-0 focus:ring-2 focus:ring-primary focus:outline-none"
+                                    onkeypress="if(event.key==='Enter') sendMessage()">
+                                <button onclick="sendMessage()" class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center text-white hover:shadow-lg transition">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            <div class="flex gap-2 mt-3 overflow-x-auto pb-1">
+                                <button onclick="quickAsk('How to repair corrupted PDF?')" class="px-3 py-1.5 bg-slate-100 rounded-full text-xs text-slate-600 hover:bg-primary hover:text-white transition whitespace-nowrap">Repair PDF</button>
+                                <button onclick="quickAsk('Convert Word to PDF in Hindi')" class="px-3 py-1.5 bg-slate-100 rounded-full text-xs text-slate-600 hover:bg-primary hover:text-white transition whitespace-nowrap">Word to PDF</button>
+                                <button onclick="quickAsk('मेरा Excel फाइल खुल नहीं रहा है')" class="px-3 py-1.5 bg-slate-100 rounded-full text-xs text-slate-600 hover:bg-primary hover:text-white transition whitespace-nowrap language-hindi">Excel नहीं खुल रहा</button>
+                                <button onclick="quickAsk('Compress a video file')" class="px-3 py-1.5 bg-slate-100 rounded-full text-xs text-slate-600 hover:bg-primary hover:text-white transition whitespace-nowrap">Compress Video</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Monetization / Dashboard Preview -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <span class="text-primary font-semibold text-sm uppercase tracking-wider">Earnings Dashboard</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-2 mb-4">Multiple Ways To Earn</h2>
+                    <p class="text-slate-600 text-lg mb-8">Track your platform's monetization through ads, subscriptions, usage, clicks, and premium features — all in one place.</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-slate-50">
+                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 flex-shrink-0">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Pro Subscriptions</h4>
+                                <p class="text-slate-600 text-sm">₹99/month recurring revenue from power users.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-slate-50">
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 flex-shrink-0">
+                                <i class="fas fa-ad"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Advertisements</h4>
+                                <p class="text-slate-600 text-sm">Earn from impressions, clicks, and sponsored placements.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-slate-50">
+                            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 flex-shrink-0">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Usage & Time Monetization</h4>
+                                <p class="text-slate-600 text-sm">Revenue sharing based on user engagement and time spent.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-slate-50">
+                            <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 flex-shrink-0">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Add-on Services</h4>
+                                <p class="text-slate-600 text-sm">Premium file recovery, express processing, API credits.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-900 rounded-3xl p-8 shadow-2xl">
+                    <div class="flex items-center justify-between mb-8">
+                        <h3 class="text-white font-bold text-xl">Revenue Overview</h3>
+                        <select class="bg-slate-800 text-white text-sm rounded-lg px-3 py-1 border border-slate-700">
+                            <option>This Month</option>
+                            <option>Last Month</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="bg-slate-800/50 rounded-2xl p-4">
+                            <p class="text-slate-400 text-sm">Total Earnings</p>
+                            <p class="text-2xl font-bold text-white mt-1">₹4,28,590</p>
+                            <p class="text-green-400 text-xs mt-1"><i class="fas fa-arrow-up"></i> 24% from last month</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-2xl p-4">
+                            <p class="text-slate-400 text-sm">Pro Users</p>
+                            <p class="text-2xl font-bold text-white mt-1">3,847</p>
+                            <p class="text-green-400 text-xs mt-1"><i class="fas fa-arrow-up"></i> 18% new</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-2xl p-4">
+                            <p class="text-slate-400 text-sm">Ad Revenue</p>
+                            <p class="text-2xl font-bold text-white mt-1">₹92,340</p>
+                            <p class="text-green-400 text-xs mt-1"><i class="fas fa-arrow-up"></i> 12% CTR</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-2xl p-4">
+                            <p class="text-slate-400 text-sm">Active Users</p>
+                            <p class="text-2xl font-bold text-white mt-1">28.5K</p>
+                            <p class="text-green-400 text-xs mt-1"><i class="fas fa-arrow-up"></i> 31% engagement</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-800/30 rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="text-slate-300 text-sm">Free vs Pro Usage</p>
+                            <p class="text-white text-sm font-bold">72% Free / 28% Pro</p>
+                        </div>
+                        <div class="h-4 bg-slate-700 rounded-full overflow-hidden">
+                            <div class="h-full w-[72%] bg-slate-500 rounded-full"></div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <p class="text-slate-300 text-sm">Ad Click Rate</p>
+                            <p class="text-green-400 text-sm font-bold">3.8%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-20 bg-slate-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Testimonials</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-2 mb-4">Loved by Users Worldwide</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-slate-600 mb-6">"I recovered a corrupted PDF in seconds. The Hindi support is amazing for my parents!"</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">R</div>
+                        <div>
+                            <p class="font-bold text-slate-900">Rahul Sharma</p>
+                            <p class="text-slate-500 text-sm">India</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-slate-600 mb-6">"Worth every rupee of the ₹99 subscription. Batch conversion saves me hours every week."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center text-secondary font-bold">P</div>
+                        <div>
+                            <p class="font-bold text-slate-900">Priya Patel</p>
+                            <p class="text-slate-500 text-sm">Business Owner</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="text-slate-600 mb-6">"The AI assistant understood my broken English and still gave perfect solutions. Great tool!"</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center text-accent font-bold">M</div>
+                        <div>
+                            <p class="font-bold text-slate-900">Mohammed Ali</p>
+                            <p class="text-slate-500 text-sm">Student</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">FAQ</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-2 mb-4">Frequently Asked Questions</h2>
+            </div>
+            
+            <div class="max-w-3xl mx-auto space-y-4">
+                <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition">
+                        <span class="font-bold text-slate-900">Is DocuSolve AI really free?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="hidden px-6 py-4 text-slate-600 bg-white">
+                        Yes! All normal file problems and basic solutions are completely free. Advanced features like batch processing, large file support, and priority repair require the ₹99/month Pro plan.
+                    </div>
+                </div>
+                
+                <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition">
+                        <span class="font-bold text-slate-900">Can I use this in Hindi?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="hidden px-6 py-4 text-slate-600 bg-white language-hindi">
+                        हाँ, आप हिंदी में अपनी फाइल की समस्या बता सकते हैं। हमारा AI हिंदी सहित 50+ भाषाओं को समझता और जवाब देता है।
+                    </div>
+                </div>
+                
+                <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition">
+                        <span class="font-bold text-slate-900">What file types are supported?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="hidden px-6 py-4 text-slate-600 bg-white">
+                        We support 100+ file formats including PDF, DOCX, XLSX, PPTX, images, videos, audio, ZIP, code files, databases, CSV, and more.
+                    </div>
+                </div>
+                
+                <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition">
+                        <span class="font-bold text-slate-900">Is my data safe?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="hidden px-6 py-4 text-slate-600 bg-white">
+                        Absolutely. We use end-to-end encryption, and your files are automatically deleted from our servers after processing.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <section class="py-20 bg-dark relative overflow-hidden">
+        <div class="blob w-96 h-96 bg-primary rounded-full -top-40 -right-20"></div>
+        <div class="blob w-80 h-80 bg-secondary rounded-full -bottom-40 -left-20"></div>
+        <div class="container mx-auto px-4 relative z-10 text-center">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">Ready To Solve Your File Problems?</h2>
+            <p class="text-slate-300 text-lg max-w-2xl mx-auto mb-8">Join millions of users who trust DocuSolve AI for their documents. Start free, upgrade when you need more power.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="openAuthModal('signup')" class="gradient-bg text-white px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition transform hover:-translate-y-1">
+                    Start Free Now
+                </button>
+                <button onclick="openAuthModal('pro')" class="glass text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white/20 transition">
+                    Get Pro for ₹99/month
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center text-white font-bold">
+                            <i class="fas fa-file-signature"></i>
+                        </div>
+                        <span class="text-xl font-bold text-white">DocuSolve AI</span>
+                    </div>
+                    <p class="text-slate-400 text-sm">AI-powered file and document problem solver for everyone, everywhere.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Product</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Features</a></li>
+                        <li><a href="#" class="hover:text-white transition">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white transition">API</a></li>
+                        <li><a href="#" class="hover:text-white transition">Security</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Company</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">About</a></li>
+                        <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-white transition">Cookie Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Advertise</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-sm text-slate-500">© 2024 DocuSolve AI. All rights reserved.</p>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition text-white"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition text-white"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition text-white"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition text-white"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Ad Widget -->
+    <div id="floating-ad" class="fixed bottom-4 right-4 z-30 max-w-xs hidden md:block">
+        <div class="bg-white rounded-2xl shadow-2xl p-4 border border-slate-200">
+            <div class="flex items-start justify-between mb-2">
+                <span class="text-xs font-bold text-slate-500 uppercase">Sponsored</span>
+                <button onclick="document.getElementById('floating-ad').style.display='none'" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+            </div>
+            <h4 class="font-bold text-slate-900 mb-1">AI Resume Builder</h4>
+            <p class="text-slate-600 text-sm mb-3">Create professional resumes from your documents in minutes.</p>
+            <button class="w-full py-2 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition">Try Now</button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="closeAuthModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
+            <div class="bg-white rounded-3xl p-8 shadow-2xl relative">
+                <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                
+                <div id="modal-pro-badge" class="hidden text-center mb-4">
+                    <span class="px-4 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 rounded-full text-sm font-bold">Pro Plan</span>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-slate-900 text-center mb-2" id="modal-title">Create Free Account</h3>
+                <p class="text-slate-500 text-center mb-6" id="modal-subtitle">Start solving your file problems instantly</p>
+                
+                <form onsubmit="handleAuth(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                        <input type="email" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="you@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                        <input type="password" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full gradient-bg text-white py-3 rounded-xl font-bold hover:shadow-lg transition">
+                        Continue
+                    </button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-slate-500" id="modal-switch">
+                        Already have an account? <a href="#" onclick="openAuthModal('login')" class="text-primary font-semibold">Log in</a>
+                    </p>
+                </div>
+                
+                <div class="mt-6 pt-6 border-t border-slate-100">
+                    <p class="text-xs text-slate-400 text-center">By continuing, you agree to our Terms and Privacy Policy.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('nav-container');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled-header');
+            } else {
+                nav.classList.remove('scrolled-header');
+            }
+        });
+
+        // Smooth scroll
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Auth Modal
+        function openAuthModal(type) {
+            const modal = document.getElementById('auth-modal');
+            const title = document.getElementById('modal-title');
+            const subtitle = document.getElementById('modal-subtitle');
+            const switchText = document.getElementById('modal-switch');
+            const proBadge = document.getElementById('modal-pro-badge');
+            
+            modal.classList.remove('hidden');
+            
+            if (type === 'login') {
+                title.textContent = 'Welcome Back';
+                subtitle.textContent = 'Log in to continue solving file problems';
+                switchText.innerHTML = 'Don\'t have an account? <a href="#" onclick="openAuthModal(\'signup\')" class="text-primary font-semibold">Sign up</a>';
+                proBadge.classList.add('hidden');
+            } else if (type === 'pro') {
+                title.textContent = 'Upgrade to Pro';
+                subtitle.textContent = 'Get unlimited access for ₹99/month';
+                switchText.innerHTML = '<span class="text-green-600 font-semibold">✓ Cancel anytime</span>';
+                proBadge.classList.remove('hidden');
+            } else {
+                title.textContent = 'Create Free Account';
+                subtitle.textContent = 'Start solving your file problems instantly';
+                switchText.innerHTML = 'Already have an account? <a href="#" onclick="openAuthModal(\'login\')" class="text-primary font-semibold">Log in</a>';
+                proBadge.classList.add('hidden');
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            alert('Account created successfully! Welcome to DocuSolve AI.');
+            closeAuthModal();
+        }
+
+        // FAQ Toggle
+        function toggleFaq(btn) {
+            const content = btn.nextElementSibling;
+            const icon = btn.querySelector('i');
+            content.classList.toggle('hidden');
+            if (content.classList.contains('hidden')) {
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // Language translations
+        const translations = {
+            en: {
+                badge: 'AI-Powered Document Assistant',
+                desc: 'Upload any file, ask any question, fix any issue. Free AI help for everyday document problems. Unlock advanced features for just ₹99/month.',
+                stat1: '100+ File Formats',
+                stat2: '50+ Languages',
+                stat3: 'Free Basic Support',
+                welcome: 'Hello! I\'m DocuSolve AI. I can help you repair, convert, analyze, or understand any file. Upload a file or ask me anything.'
+            },
+            hi: {
+                badge: 'AI-संचालित दस्तावेज़ सहायक',
+                desc: 'कोई भी फाइल अपलोड करें, कोई भी सवाल पूछें, कोई भी समस्या ठीक करें। रोजमर्रा की दस्तावेज़ समस्याओं के लिए मुफ्त AI सहायता। केवल ₹99/माह में एडवांस फीचर्स अनलॉक करें।',
+                stat1: '100+ फाइल प्रारूप',
+                stat2: '50+ भाषाएँ',
+                stat3: 'मुफ्त बुनियादी सहायता',
+                welcome: 'नमस्ते! मैं DocuSolve AI हूँ। मैं किसी भी फाइल को रिपेयर, कन्वर्ट, एनालाइज़ या समझने में आपकी मदद कर सकता हूँ। फाइल अपलोड करें या कुछ भी पूछें।'
+            },
+            es: {
+                badge: 'Asistente de Documentos con IA',
+                desc: 'Sube cualquier archivo, haz cualquier pregunta, soluciona cualquier problema. Ayuda gratuita de IA para problemas cotidianos de documentos.',
+                stat1: '100+ Formatos',
+                stat2: '50+ Idiomas',
+                stat3: 'Soporte Básico Gratis',
+                welcome: '¡Hola! Soy DocuSolve AI. Puedo ayudarte a reparar, convertir, analizar o entender cualquier archivo.'
+            },
+            fr: {
+                badge: 'Assistant de Documents IA',
+                desc: 'Téléchargez n\'importe quel fichier, posez n\'importe quelle question, résolvez n\'importe quel problème.',
+                stat1: '100+ Formats',
+                stat2: '50+ Langues',
+                stat3: 'Support Gratuit',
+                welcome: 'Bonjour! Je suis DocuSolve AI. Je peux vous aider à réparer, convertir, analyser ou comprendre n\'importe quel fichier.'
+            },
+            de: {
+                badge: 'KI-Dokumentenassistent',
+                desc: 'Laden Sie jede Datei hoch, stellen Sie Fragen, beheben Sie Probleme. Kostenlose KI-Hilfe für alltägliche Dokumentenprobleme.',
+                stat1: '100+ Formate',
+                stat2: '50+ Sprachen',
+                stat3: 'Kostenloser Support',
+                welcome: 'Hallo! Ich bin DocuSolve AI. Ich kann Ihnen helfen, jede Datei zu reparieren, zu konvertieren, zu analysieren oder zu verstehen.'
+            },
+            zh: {
+                badge: 'AI文档助手',
+                desc: '上传任何文件，提出任何问题，解决任何问题。为日常文档问题提供免费AI帮助。',
+                stat1: '100+ 文件格式',
+                stat2: '50+ 语言',
+                stat3: '免费基础支持',
+                welcome: '你好！我是DocuSolve AI。我可以帮助您修复、转换、分析或理解任何文件。'
+            },
+            ar: {
+                badge: 'مساعد المستندات بالذكاء الاصطناعي',
+                desc: 'قم بتحميل أي ملف، واطرح أي سؤال، وحل أي مشكلة. مساعدة ذكاء اصطناعي مجانية لمشاكل المستندات اليومية.',
+                stat1: '100+ تنسيق',
+                stat2: '50+ لغة',
+                stat3: 'دعم أساسي مجاني',
+                welcome: 'مرحباً! أنا DocuSolve AI. يمكنني مساعدتك في إصلاح أو تحويل أو تحليل أو فهم أي ملف.'
+            }
+        };
+
+        function changeLanguage(lang) {
+            const t = translations[lang];
+            if (t) {
+                document.getElementById('hero-badge').textContent = t.badge;
+                document.getElementById('hero-desc').textContent = t.desc;
+                document.getElementById('hero-stat1').textContent = t.stat1;
+                document.getElementById('hero-stat2').textContent = t.stat2;
+                document.getElementById('hero-stat3').textContent = t.stat3;
+                document.getElementById('welcome-message').textContent = t.welcome;
+                
+                if (lang === 'hi') {
+                    document.getElementById('welcome-message').classList.add('language-hindi');
+                } else {
+                    document.getElementById('welcome-message').classList.remove('language-hindi');
+                }
+            }
+        }
+
+        // AI Chat functionality
+        const responses = {
+            hi: {
+                pdf: 'मैं आपकी PDF को रिपेयर कर सकता हूँ। कृपया फाइल अपलोड करें। मैं उसे स्कैन करूँगा और ठीक कर दूँगा।',
+                excel: 'Excel फाइल न खुलने की समस्या आम है। क्या आप फाइल अपलोड कर सकते हैं? मैं इसे रिकवर करने की कोशिश करूँगा।',
+                word: 'Word फाइल को PDF में बदलना बहुत आसान है। फाइल अपलोड करें और "Convert to PDF" चुनें।',
+                default: 'आपकी समस्या समझ आ गई। क्या आप संबंधित फाइल अपलोड कर सकते हैं ताकि मैं बेहतर मदद कर सकूँ?'
+            },
+            en: {
+                pdf: 'I can repair your PDF file. Please upload it and I will scan and fix the corruption automatically.',
+                excel: 'Excel files not opening is a common issue. Please upload the file and I will attempt to recover it.',
+                word: 'Converting Word to PDF is easy. Upload the file and select "Convert to PDF".',
+                default: 'I understand your issue. Can you upload the relevant file so I can assist you better?'
+            }
+        };
+
+        function quickAsk(text) {
+            document.getElementById('chat-input').value = text;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate typing
+            setTimeout(() => {
+                const lang = document.getElementById('languageSelect').value;
+                const response = generateResponse(message, lang);
+                addMessage(response, 'bot');
+            }, 1000);
+        }
+
+        function handleFileUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                addMessage(`Uploaded file: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'user');
+                
+                setTimeout(() => {
+                    const lang = document.getElementById('languageSelect').value;
+                    const msg = lang === 'hi' 
+                        ? `फाइल "${file.name}" प्राप्त हो गई। मैं इसे विश्लेषित कर रहा हूँ... ✅ विश्लेषण पूरा हुआ। यह फाइल सामान्य दिख रही है। आप इसे कन्वर्ट, रिपेयर या संपादित करवा सकते हैं।`
+                        : `File "${file.name}" received. Analyzing... ✅ Analysis complete. The file appears normal. You can convert, repair, or edit it.`;
+                    addMessage(msg, 'bot');
+                }, 1500);
+            }
+        }
+
+        function generateResponse(message, lang) {
+            const lower = message.toLowerCase();
+            const r = responses[lang] || responses.en;
+            
+            if (lower.includes('pdf')) return r.pdf;
+            if (lower.includes('excel') || lower.includes('xlsx') || lower.includes('एक्सेल')) return r.excel;
+            if (lower.includes('word') || lower.includes('docx') || lower.includes('वर्ड')) return r.word;
+            if (lower.includes('hindi') || lower.includes('हिंदी')) return 'हाँ, मैं हिंदी में बात कर सकता हूँ। आप अपनी समस्या हिंदी में बताएँ।';
+            if (lower.includes('price') || lower.includes('cost') || lower.includes('₹')) {
+                return lang === 'hi' 
+                    ? 'DocuSolve AI बुनियादी सुविधाओं के लिए पूरी तरह मुफ्त है। एडवांस फीचर्स के लिए केवल ₹99/माह का प्रो प्लान है।'
+                    : 'DocuSolve AI is completely free for basic features. Advanced features cost just ₹99/month for the Pro plan.';
+            }
+            return r.default;
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'chat-message flex items-start gap-3';
+            
+            if (sender === 'user') {
+                div.innerHTML = `
+                    <div class="ml-auto bg-primary text-white p-4 rounded-2xl rounded-tr-none shadow-sm max-w-[80%]">
+                        <p>${text}</p>
+                    </div>
+                    <div class="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center text-slate-700 text-xs flex-shrink-0">
+                        <i class="fas fa-user"></i>
+                    </div>
+                `;
+            } else {
+                const isHindi = /[\u0900-\u097F]/.test(text);
+                div.innerHTML = `
+                    <div class="w-8 h-8 gradient-bg rounded-full flex items-center justify-center text-white text-xs flex-shrink-0">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-100 max-w-[80%]">
+                        <p class="text-slate-800 ${isHindi ? 'language-hindi' : ''}">${text}</p>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Click tracking simulation for monetization
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('button') || e.target.closest('a')) {
+                console.log('Monetization event: user click tracked');
+            }
+        });
+
+        // Show floating ad after 3 seconds
+        setTimeout(() => {
+            const ad = document.getElementById('floating-ad');
+            if (ad) ad.style.display = 'block';
+        }, 3000);
+    </script>
+</body>
+</html>
